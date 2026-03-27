@@ -106,13 +106,13 @@
         <div class="total"><span>TOTAL</span><strong id="total">$ 0.00</strong></div>
       </div>
       
-<p class="disclaimer">
+<p id="avisoPDF" class="disclaimer">
   La presente cotización es válida por 15 días e incluye únicamente los conceptos señalados; 
-  cualquier servicio adicional será cotizado aparte; el pago deberá realizarse al momento del ingreso, 
-  pacientes de aseguradora debe presentarse con su carta de autorización vigente; 
-  En caso de cancelación el paciente deberá avisar con al menos 24 horas de anticipación, 
-  de lo contrario se cobrará el medicamento y los servicios asociados al medicamento; 
-  La presente cotización está sujeta a cambios si el médico tratante así lo indica.
+  cualquier servicio adicional será cotizado por separado. Para estos medicamentos se requiere 
+  un anticipo del 50% para su solicitud y programación. Una vez realizado el anticipo, no se aceptan 
+  cancelaciones ni modificaciones. El pago deberá realizarse al momento del ingreso. Los pacientes con 
+  aseguradora deberán presentarse con su carta de autorización vigente. La presente cotización está sujeta 
+  a cambios si el médico tratante así lo indica.
 </p>
 <button id="btnPDF">Descargar PDF</button>
     </section>
@@ -131,13 +131,27 @@
 
     btn.addEventListener("click", function() {
       const { jsPDF } = window.jspdf;
-      html2canvas(document.getElementById("cotizador"), { 
-        scale: 2, 
+      html2canvas(document.getElementById("cotizador"), {
+        scale: 2,
         useCORS: true,
+        scrollY: 0,
         onclone: (clonedDoc) => {
           clonedDoc.querySelectorAll(
-            '#buscarMed, #ordenMed, #selMedicamento, #cantMed, #selServicio, #cantServ, #descServ, #addMed, #addServ, .btn-eliminar, #btnPDF, table button'
+            '#buscarMed, #ordenMed, #selMedicamento, #cantMed, #selServicio, #cantServ, #descServ, #addMed, #addServ, #btnPDF, table button'
           ).forEach(el => el.style.display = 'none');
+
+          const aviso = clonedDoc.getElementById('avisoPDF');
+          if (aviso) {
+            aviso.style.display = 'block';
+            aviso.style.visibility = 'visible';
+            aviso.style.opacity = '1';
+            aviso.style.fontSize = '10px';
+            aviso.style.lineHeight = '1.35';
+            aviso.style.marginTop = '14px';
+            aviso.style.color = '#4b5563';
+            aviso.style.textAlign = 'justify';
+            aviso.style.pageBreakInside = 'avoid';
+          }
         }
       }).then(function(canvas) {
         const imgData = canvas.toDataURL("image/png");
@@ -145,18 +159,18 @@
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
 
-        let imgWidth = pageWidth;
+        let imgWidth = pageWidth - 10;
         let imgHeight = (canvas.height * imgWidth) / canvas.width;
-        if (imgHeight > pageHeight) {
-          const ratio = pageHeight / imgHeight;
+        if (imgHeight > pageHeight - 10) {
+          const ratio = (pageHeight - 10) / imgHeight;
           imgWidth *= ratio;
           imgHeight *= ratio;
         }
 
         const x = (pageWidth - imgWidth) / 2;
-        pdf.addImage(imgData, "PNG", x, 0, imgWidth, imgHeight);
+        const y = 5;
+        pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
 
-        // Datos dinámicos
         let paciente = document.getElementById("paciente").value || "Paciente";
         let fecha = document.getElementById("fechaEmision").value || new Date().toISOString().split("T")[0];
 

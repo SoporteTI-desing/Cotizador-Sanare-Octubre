@@ -31,7 +31,8 @@ th,td{border:1px solid #eadfd9;padding:8px;text-align:center}
 .disclaimer {
   font-size: 10px;
   color: #6b7280;
-  text-align: center;
+  text-align: justify;
   margin: 12px 0;
-  line-height: 1.3;
+  line-height: 1.35;
+  page-break-inside: avoid;
 }
